@@ -6,7 +6,6 @@ import calendar
 from twilio.rest import Client
 
 STOCK = "TSLA"
-COMPANY_NAME = "Tesla Inc"
 
 
 def get_previous_day_date(input_date: dt) -> str:
@@ -56,14 +55,14 @@ prv_yesterday_closing_price = get_close_price(prv_yesterday_date)
 
 # Get the percentage of increase or decrease difference between those two dates
 difference_closing_prices = round(float(yesterday_closing_price - prv_yesterday_closing_price), 2)
-percentage_closing_prices = difference_closing_prices / yesterday_closing_price * 100
+percentage_closing_prices = round(difference_closing_prices / yesterday_closing_price * 100, 2)
 
 ## Used https://newsapi.org
-# Get the first 3 news pieces for the COMPANY_NAME.
+# Get the first 3 news pieces for the STOCK.
 if abs(percentage_closing_prices) >= 5:
     news_api_key = os.environ.get("NEWS_API_KEY")
     news_api_parameters = {
-        "q": f"{STOCK}",
+        "q": STOCK,
         "searchIn": "title,description",
         "from": prv_yesterday_date,
         "to": yesterday_date,
@@ -93,7 +92,7 @@ if abs(percentage_closing_prices) >= 5:
             rise_or_fall_sign = "🔻"
         else:
             rise_or_fall_sign = "🔺"
-        msg_body = (f"{STOCK}: {rise_or_fall_sign}{abs(round(percentage_closing_prices, 2))}%\n"
+        msg_body = (f"{STOCK}: {rise_or_fall_sign}{abs(percentage_closing_prices)}%\n"
                     f"Headline: {article["Headline"]}.\n"
                     f"Brief: {article["Brief"]}")
         message = client.messages.create(body=msg_body, from_=TWILIO_phone_number, to=your_phone_number)
